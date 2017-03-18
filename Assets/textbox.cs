@@ -8,6 +8,8 @@ public class textbox : MonoBehaviour {
     //Reference to the text componenet 
     public GameObject txtchild;
     Text text;
+    public GameObject name_child;
+    Text name_text;
 
     //The complete string of the text
     string fulltxt = "";
@@ -17,7 +19,7 @@ public class textbox : MonoBehaviour {
     int txtindex = 0;
 
     //Set true when the characters are done being added
-    bool text_done = false;
+    public bool text_done = false;
     //Timer variables that affect character speed
     int text_speed = 5;
     int text_timer = 0;
@@ -25,10 +27,13 @@ public class textbox : MonoBehaviour {
     //Reference to the current scene of the game
     scenescript current_scene;
 
+    public bool locked = false;
+
 	//Run once at start of object
     void Start() {
         //Assign references and initialize text
         text = txtchild.GetComponent<Text>();
+        name_text = name_child.GetComponent<Text>();
         current_scene = gameObject.GetComponent<scenescript>();
         fulltxt = current_scene.Get_Dialogue();
         Assign_Text();
@@ -41,7 +46,7 @@ public class textbox : MonoBehaviour {
             text_timer += 1;
 
             //Make text go faster when pressed
-            if (Input.GetKey("z")){text_speed = 1;}
+            if (!locked && Input.GetKey("z")){text_speed = 1;}
             else {text_speed = 4;}
 
             if (text_timer >= text_speed) {
@@ -73,14 +78,14 @@ public class textbox : MonoBehaviour {
                 }
             }
             //Otherwise, simply wait for the player to advance the text
-            else if (Input.GetKeyDown("z")) { Next_Text();}
+            else if (!locked && Input.GetKeyDown("z")) { Next_Text();}
         }
     }
 
 
 
     //Change the text to the next one in the scene
-    void Next_Text() {
+    public void Next_Text() {
         //Move to the next text
         current_scene.index += 1;
         fulltxt = current_scene.Get_Dialogue();
@@ -89,11 +94,13 @@ public class textbox : MonoBehaviour {
         text_timer = 0;
         txtindex = 0;
         displaytxt = "";
+        locked = false;
     }
 
     //Give the string to the textbox
     void Assign_Text() {
         text.text = displaytxt;
+        name_text.text = current_scene.Get_Speaker();
     }
 
     //Add the next character of the dialogue to the display text
